@@ -160,7 +160,7 @@ function App() {
             fontSize: "large",
             color: "white",
             backgroundImage:
-              "linear-gradient(to right, #000046 0%, #194653ff 51%, #000046 100%)",
+              "linear-gradient(to right, #000046 0%, 51%, #000046 100%)",
             backgroundSize: "200% auto",
             boxShadow: "0 0 20px #eee",
             transition: "0.5s",
