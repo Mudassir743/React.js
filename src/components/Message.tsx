@@ -1,0 +1,7 @@
+// const Massage = () => {
+//   let count = 0;
+//   count++;
+//   console.log("Message Called ", count);
+//   return <div> Message {count} </div>;
+// };
+// export default Massage;
