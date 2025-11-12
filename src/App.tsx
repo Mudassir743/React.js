@@ -26,7 +26,9 @@
 //   );
 // }
 
-import { Component, useState } from "react";
+import { effect } from "zod";
+
+// import { Component, useState } from "react";
 
 // import { Stats } from "fs";
 // import { useState } from "react";
@@ -720,3 +722,283 @@ import { Component, useState } from "react";
 // };
 
 // export default App;
+// import React from "react";
+// import Form from "./components/Form";
+
+// const App = () => {
+//   return (
+//     <div>
+//       <Form />
+//     </div>
+//   );
+// };
+
+// export default App;
+
+// ============================== project expense tracker ================================
+
+// import { useState } from "react";
+// import ExpenseList from "./Expense_tracker/component/ExpenseList";
+// import ExpenseFilter from "./Expense_tracker/ExpenseFilter";
+// import ExpenseForm from "./components/ExpenseForm";
+// const App_Expense = () => {
+//   const [selectCategory, setSelectCategory] = useState("");
+//   const [expense, setExpense] = useState([
+//     { id: 1, description: "aaa", amount: 10, category: "Utilities" },
+//     { id: 2, description: "bbb", amount: 20, category: "Utilities" },
+//     { id: 3, description: "ccc", amount: 30, category: "Grocaries" },
+//     { id: 4, description: "ddd", amount: 40, category: "Entertainment" },
+//     { id: 5, description: "eee", amount: 50, category: "Utilities" },
+//   ]);
+
+//   const visibleExpense = selectCategory
+//     ? expense.filter((e) => e.category === selectCategory)
+//     : expense;
+//   return (
+//     <div>
+//       <div
+//         className="mb-5"
+//         style={{
+//           color: "GrayText",
+//           fontFamily: "sans-serif",
+//         }}
+//       >
+//         <ExpenseForm
+//           onSubmit={(newExpense) =>
+//             setExpense([
+//               ...expense,
+//               {
+//                 ...newExpense,
+//                 id: Date.now(),
+//                 description: "",
+//               },
+//             ])
+//           }
+//         />
+//       </div>
+//       <div className="mb-3">
+//         <ExpenseFilter
+//           onSelectCategory={(category) => setSelectCategory(category)}
+//         />
+//       </div>
+
+//       <ExpenseList
+//         expenses={visibleExpense}
+//         onDelete={(id) => setExpense(expense.filter((e) => e.id !== id))}
+//       />
+//     </div>
+//   );
+// };
+
+// export default App_Expense;
+
+// =============================== understanding the use effect ================================
+
+// import React, { useEffect, useRef } from "react";
+
+// function App() {
+//   const ref = useRef<HTMLInputElement>(null);
+//   // AfterRander
+//   useEffect(() => {
+//     if (ref.current) ref.current.focus();
+//   });
+//   // Side effect
+//   useEffect(() => {
+//     document.title = "my App";
+//   });
+
+//   return (
+//     <div>
+//       <div> Ask Question</div>
+//       <input
+//         style={{
+//           borderRadius: "16px",
+//           backgroundColor: "#87CEEB",
+//           border: "none",
+//           marginTop: "4px",
+//         }}
+//         ref={ref}
+//         type="text"
+//         className="form-control"
+//       />
+//     </div>
+//   );
+// }
+
+// export default App;
+// =============================== effect dependencies ================================
+
+// import React, { useEffect, useState } from "react";
+// import ProductList from "./Expense_tracker/component/ProductList";
+
+// function App() {
+//   const [category, setCategory] = useState("");
+//   return (
+//     <div>
+//       <select
+//         name=""
+//         className="form-select"
+//         onChange={(event) => setCategory(event.target.value)}
+//       >
+//         <option style={{ backgroundColor: "yellow" }} value="">
+//           Select an option
+//         </option>
+//         <option value="Clothing">Clothing</option>
+//         <option value="Household">Household</option>
+//       </select>
+//       <ProductList category={category} />{" "}
+//     </div>
+//   );
+// }
+
+// export default App;
+// ============================ effect clean up ==========================
+
+// import React, { useEffect } from "react";
+// const connect = () => console.log("Connect");
+// const disconnect = () => console.log("Disconnect");
+
+// function App() {
+//   useEffect(() => {
+//     connect();
+//     return () => disconnect();
+//   });
+//   return <div></div>;
+// }
+
+// export default App;
+
+// ================================ fatchig data ===============================
+// import React, { useEffect, useState } from "react";
+// import axios, { AxiosError } from "axios";
+// interface User {
+//   id: number;
+//   name: string;
+// }
+
+// function App() {
+//   const [user, setUser] = useState<User[]>([]);
+//   const [error, setError] = useState("");
+
+//   useEffect(() => {
+//     const fetchUser = async () => {
+//       try {
+//         const res = await axios.get<User[]>(
+//           "https://jsonplaceholder.typicode.com/users"
+//         );
+//         setUser(res.data);
+//       } catch (err) {
+//         setError((err as AxiosError).message);
+//       }
+//     };
+//     fetchUser();
+
+//     // get ->
+//     // .then((res) => setUser(res.data))
+//     // .catch((err) => setError(err.message));
+//   }, []);
+//   return (
+//     <>
+//       {error && <p className="text-danger">{error} </p>}
+//       <ul>
+//         {user.map((user) => (
+//           <li key={user.id}> {user.name}</li>
+//         ))}
+//       </ul>
+//     </>
+//   );
+// }
+
+// export default App;
+
+// ========================= cancelling a fetch request ==========================
+
+import React, { useEffect, useState } from "react";
+import axios, { CanceledError } from "axios";
+
+interface User {
+  filter: React.SetStateAction<User[]>;
+  id: number;
+  name: string;
+}
+
+function App() {
+  const [user, setUser] = useState<User[]>([]);
+  const [error, setError] = useState("");
+  const [loding, setLoading] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    axios
+      .get<User[]>("https://jsonplaceholder.typicode.com/users/", {
+        signal: controller.signal,
+      })
+      .then((res) => {
+        setUser(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (err instanceof CanceledError) return;
+        setError(err.message);
+      });
+    setLoading(false);
+    return () => controller.abort();
+  }, []);
+  const deleteUser = (userToDelete: User) => {
+    const originalUsers = [...user];
+    setUser((prevUsers) => prevUsers.filter((u) => u.id !== userToDelete.id));
+    axios
+      .delete("https://jsonplaceholder.typicode.com/users/" + userToDelete.id)
+      .catch((err) => {
+        setError(err.message);
+        setUser(originalUsers);
+      });
+  };
+  const addUser = () => {
+    const originalUsers = [...user];
+    const newUser: User = {
+      id: 0,
+      name: "Mudassir",
+      filter: [],
+    };
+    setUser([newUser, ...user]);
+    axios
+      .post("https://jsonplaceholder.typicode.com/users/", newUser)
+      .then(({ data: savedUser }) => setUser([savedUser, ...user]))
+      .catch((err) => {
+        setError(err.message);
+        setUser(originalUsers);
+      });
+  };
+
+  return (
+    <>
+      {error && <p className="text-danger">{error} </p>}
+      {loding && <div className="spinner-border"></div>}
+      <button className="btn btn-primary mb-3" onClick={addUser}>
+        Add User
+      </button>
+      <ul className="list-group">
+        {user.map((user) => (
+          <li
+            style={{ backgroundColor: "PapayaWhip", color: "Olive" }}
+            key={user.id}
+            className="list-group-item d-flex justify-content-between "
+          >
+            {" "}
+            {user.name}
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => deleteUser(user)}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export default App;
